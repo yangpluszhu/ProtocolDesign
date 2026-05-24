@@ -130,6 +130,6 @@ python src/encrypt_resources.py
 
 ## 联系方式
 
-- 软件制作方：上海中医药大学附属龙华医院临床研究中心
+- 上海中医药大学附属龙华医院临床研究中心
 - 作者邮箱：yangpluszhu@sina.com
 - 作者 GitHub：<https://github.com/yangpluszhu>
