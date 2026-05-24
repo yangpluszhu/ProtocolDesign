@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+*.egg
+
+# Type checking
+.mypy_cache/
+
+# Build output
+build/
+APP/
+*.spec.bak
+
+# Encrypted resources (generated at build time)
+resources/resources.enc
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# Debug
+*.debug.txt
+
+# Generated help docs at project root (built into APP/)
+/ProtocolDesign_帮助文档.docx
+/ProtocolDesign_帮助文档.pdf
