@@ -1,135 +1,233 @@
 # ProtocolDesign
 
-> 面向中文医学研究场景的 Windows 桌面工具，用于将研究摘要自动扩写为结构完整、格式规范的回顾性队列研究方案 DOCX 文档。
+> Clinical Research Protocol Assistant — An Automated Retrospective Cohort Study Protocol Generation Tool
 
-ProtocolDesign 聚焦临床科研与医学文本规范化写作，当前版本支持将研究团队提供的方案摘要输入到桌面应用中，经由 OpenAI 兼容大模型接口生成完整研究方案，并输出可继续审阅与修改的 Word 文档。
+**ProtocolDesign** is a Windows desktop application designed for Chinese medical research scenarios, developed by the [Clinical Research Center, Longhua Hospital, Shanghai University of Traditional Chinese Medicine](https://www.longhuahospital.com.cn). It automatically expands a brief **research summary** into a structurally complete, professionally formatted **Chinese retrospective cohort study protocol DOCX document**.
 
-![ProtocolDesign 主界面](help_assets/ProtocolDesign_主界面_标注.png)
+The software connects to external inference service providers (e.g., DeepSeek, Kimi, GLM, MiMo) and leverages built-in cohort-protocol skill rules and template writing guidelines to transform concise study summaries into publication-ready research protocols.
 
-## 为什么使用 ProtocolDesign
+## 🎯 Key Benefits
 
-- **面向真实研究写作场景**：输出为可直接审阅和继续编辑的 `.docx` 文档，而不是仅供复制的纯文本。
-- **保留研究方案结构**：自动生成封面、目录、结构化摘要表、正文各章节及附表。
-- **兼容多家模型接口**：支持 DeepSeek、Kimi、GLM、MiMo 以及自定义 OpenAI 兼容服务。
-- **更适合中文医学写作**：内置章节写作规则、提示词资源和方案模板约束。
-- **桌面端可直接交付**：支持打包为 `ProtocolDesign.exe`，便于研究团队在 Windows 环境中分发使用。
-- **API Key 本地加密保存**：可选使用 Windows DPAPI 加密保存密钥，不以明文写入配置。
+| Traditional Workflow | With ProtocolDesign |
+|---------------------|---------------------|
+| Manual chapter-by-chapter writing, taking days | Assisted full-protocol generation in minutes |
+| Inconsistent structure and formatting | Built-in 50+ standardized section headings and DOCX template |
+| Missing key methodological elements | Automated validation of follow-up windows, outcome observation windows, and appendix completeness |
+| Requires professional typesetting | One-click generation of cover page, table of contents, summary table, body text, and appendix tables |
 
-## 当前能力
+## ✨ Features
 
-当前仅正式支持：
+- **📥 Multi-format Summary Input** — Supports `.docx`, `.md`, and `.txt` study summaries
+- **🔌 Multi-platform Integration** — Built-in configurations for DeepSeek, Kimi, GLM, MiMo; supports any OpenAI-compatible API endpoint
+- **🧠 Inference Mode Adaptation** — Automatically enables/disables reasoning mode per provider (maximum intensity for DeepSeek/GLM/MiMo; disabled per version requirements for Kimi)
+- **📄 Professional DOCX Output** — Cover page, updatable table of contents, structured summary table, complete methodology sections, appendix tables
+- **✔️ Automated Quality Validation** — Section completeness, follow-up time-window, outcome observation window, template artifact and placeholder detection
+- **🔄 Multi-layer Fault Tolerance** — JSON repair (control characters / encoding errors / trailing commas), streaming decode, retry with backoff, Kimi segmented assembly
+- **🔐 Secure Key Storage** — Optional encryption of API keys using Windows DPAPI per user identity
+- **📋 Run Brief** — Automatically outputs a brief report including input parameters, service information, and risk warnings after each generation
 
-- `回顾性队列研究方案`
+## 📑 Generated Protocol Structure
 
-界面中展示的其他模块为后续升级预留，当前版本不会用于正式生成。
+The output DOCX document includes the following complete structure:
 
-## 生成结果
+```
+Cover Page (study title, center, investigator, version info, etc.)
+Table of Contents
+Protocol Summary (structured two-column table)
+  1.  Background and Significance
+  2.  Study Objectives (primary / secondary)
+  3.  Study Design (type, time zero, bias minimization)
+  4.  Study Subjects (data source, target population, inclusion/exclusion criteria, sample size)
+  5.  Exposure Definition and Selection
+  6.  Comparator Group Definition and Selection
+  7.  Comparability of Indications, Contraindications, and Treatment Intensity
+  8.  Concomitant Medications, Drug Switching, Discontinuation, Compliance, and Misclassification
+  9.  Outcome Definition and Measurement (primary / secondary / safety / competing events)
+ 10.  Covariate Selection and Measurement
+ 11.  Statistical Analysis Methods (confounding control, subgroup, missing data, sensitivity analyses)
+ 12.  Data Management
+ 13.  Ethical Considerations
+      Appendix: Recommended Attachments and Forms
+      Appendix Table 1: Operational Definitions of Exposure, Comparator, Outcomes, and Covariates
+      Appendix Table 2: Sensitivity Analysis Matrix
+```
 
-生成成功后，软件会在目标目录输出：
+## 🔗 Supported Inference Service Providers
 
-- 完整研究方案 `.docx`
-- 同名 `_运行简报.txt`
+| Provider | Default Engine | Base URL | Reasoning Mode |
+|----------|---------------|----------|---------------|
+| **DeepSeek** | deepseek-v4-pro | `https://api.deepseek.com/v1` | ✅ Maximum intensity |
+| **Kimi** | kimi-k2.6 | `https://api.moonshot.cn/v1` | ❌ Disabled per version (segmented generation) |
+| **GLM** | glm-4.5 | `https://open.bigmodel.cn/api/paas/v4` | ✅ Maximum intensity |
+| **MiMo** | mimo-v2.5-pro | `https://api.xiaomimimo.com/v1` | ✅ Maximum intensity |
+| **Custom** | User-specified | User-specified | Compatibility mode |
 
-如果生成失败，程序目录会额外写出：
+> All providers communicate through the OpenAI-compatible `chat/completions` API. You must register an account with the respective platform and obtain an `api_key` before use.
 
-- `ProtocolDesign_error.log`
+## 🏗️ Architecture Overview
 
-## 快速开始
+```
+User Input (summary document + service configuration)
+       │
+       ▼
+  ┌─ Rule Layer ─────────────────────────┐
+  │  SKILL.md (cohort-protocol skill)     │
+  │  template-writing-guide.md (template) │
+  │  Dynamic prompt assembly               │
+  └──────────────┬───────────────────────┘
+                 │
+                 ▼
+  ┌─ Invocation Layer ────────────────────┐
+  │  Per-provider independent workflows   │
+  │  · Reasoning mode / JSON mode fallback│
+  │  · Streaming / non-streaming switch   │
+  │  · Transient overload auto-retry      │
+  │    (429 / 5xx)                        │
+  │  · Kimi cover-summary + section-batch│
+  │    assembly                           │
+  └──────────────┬───────────────────────┘
+                 │
+                 ▼
+  ┌─ Validation Layer ────────────────────┐
+  │  JSON parsing + control-char repair   │
+  │  Section completeness validation       │
+  │  Follow-up / outcome window checks    │
+  │  Template artifact & placeholder scan  │
+  │  Auto-retry on validation failure      │
+  └──────────────┬───────────────────────┘
+                 │
+                 ▼
+  ┌─ Rendering Layer ────────────────────┐
+  │  protocol_renderer                    │
+  │  · Applies corhortCRU-small.docx     │
+  │    template                           │
+  │  · Cover → TOC → Summary → Body →    │
+  │    Appendix                            │
+  │  · Automated font, color, and table   │
+  │    formatting                         │
+  └──────────────┬───────────────────────┘
+                 │
+                 ▼
+    Output DOCX + Run Brief TXT
+```
 
-### 环境要求
+## 📁 Project Structure
+
+```
+ProtocolDesign/
+├── src/
+│   ├── ProtocolDesign.py            # Main application: GUI + service invocation + workflow orchestration
+│   ├── protocol_renderer.py         # DOCX rendering engine (JSON → Word document)
+│   ├── build_help_docx.py          # Help documentation DOCX generator
+│   ├── resource_crypto.py           # Resource encryption/decryption (AES-256-GCM, dev/release dual mode)
+│   └── encrypt_resources.py         # Build-time resource encryption tool
+├── resources/
+│   ├── SKILL.md                    # cohort-protocol skill rules (prompt core)
+│   ├── references/
+│   │   └── template-writing-guide.md  # Template writing guide (prompt core)
+│   └── assets/
+│       └── corhortCRU-small.docx   # DOCX formatting template
+├── docs/
+│   ├── ProtocolDesign_帮助文档.md
+│   ├── ProtocolDesign_帮助文档.docx
+│   └── ProtocolDesign_帮助文档.pdf
+├── help_assets/                     # UI screenshots
+├── samples/                         # Example summary documents
+├── packaging/                       # PyInstaller packaging configuration
+├── build_windows.ps1                # Windows build script
+├── requirements.txt                 # Python dependencies
+├── CHANGELOG.md                     # Version changelog
+├── CONTRIBUTING.md                  # Contribution guidelines
+├── LICENSE                          # GPL-3.0 license
+└── README.md                        # This file
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
 
 - Windows 10 / 11
 - Python 3.11+
-- 可访问 OpenAI 兼容 `chat/completions` 接口的大模型服务
-- LibreOffice（可选，仅用于生成帮助文档 PDF）
+- One or more inference service provider accounts (DeepSeek / Kimi / GLM / MiMo or any OpenAI-compatible endpoint)
 
-### 安装依赖
-
-```powershell
-python -m pip install -r requirements.txt
-```
-
-### 从源码运行
+### Run from Source
 
 ```powershell
+# 1. Clone the repository
+git clone https://github.com/yangpluszhu/ProtocolDesign.git
+cd ProtocolDesign
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Launch the application
 python src/ProtocolDesign.py
 ```
 
-### 构建发布版
+### Build Executable
 
 ```powershell
+# Full build (install deps + syntax check + help docs + encrypt resources + package EXE)
 .\build_windows.ps1
+
+# Skip dependency installation and PDF generation
+.\build_windows.ps1 -SkipInstall -SkipPdf
 ```
 
-构建完成后，发布产物会输出到 `APP/` 目录。
+The built executable will be located at `APP/ProtocolDesign.exe`.
 
-## 使用流程
+## 📖 Usage
 
-1. 启动 `ProtocolDesign.exe` 或运行源码版本。
-2. 选择功能模块：当前请选择 `回顾性队列研究方案`。
-3. 导入方案摘要文件，支持 `.docx`、`.md`、`.txt`。
-4. 配置模型提供商、`base_url`、`api_key` 和模型名称。
-5. 选择输出目录并填写输出文件名。
-6. 点击“确定生成方案”，等待模型生成和 DOCX 渲染完成。
+1. **Select Module** — Choose "Retrospective Cohort Study Protocol" (the only module available in V1.0)
+2. **Select Summary Document** — Click browse and pick a prepared `.docx` / `.md` / `.txt` summary file
+3. **Configure Service Endpoint** — Select a provider, then enter `base_url`, `api_key`, and the inference engine name
+4. **Set Output Location** — Choose an output directory and filename
+5. **Click Generate** — Wait for protocol expansion and DOCX rendering to complete
+6. **Manual Review** — Open the generated document in Word, update the table of contents, and perform a line-by-line review
 
-## 项目结构
+> 💡 **Summary Tips**: For best results, your summary should include the study title, data source, target population, inclusion/exclusion criteria, exposure and comparator definitions, outcome measures, statistical analysis considerations, and ethical requirements. The more specific the summary, the more reliable the output.
 
-```text
-ProtocolDesignCode/
-├─ src/
-│  ├─ ProtocolDesign.py          # 主程序：UI、模型调用、JSON 修复与生成流程
-│  ├─ protocol_renderer.py       # DOCX 渲染器
-│  ├─ build_help_docx.py         # 帮助文档生成脚本
-│  ├─ resource_crypto.py         # 打包后资源解密加载
-│  └─ encrypt_resources.py       # 构建时资源加密
-├─ resources/                    # 提示词资源、写作指南、模板资产
-├─ docs/                         # Markdown 帮助文档
-├─ help_assets/                  # README / 帮助文档截图资源
-├─ samples/                      # 示例摘要文件
-├─ APP/                          # 打包输出目录
-├─ build_windows.ps1             # Windows 一键打包脚本
-└─ requirements.txt
-```
+> ⚠️ For detailed instructions, see [`docs/ProtocolDesign_帮助文档.md`](docs/ProtocolDesign_帮助文档.md) or click the "Open Help Document" button in the application.
 
-## 文档
+## 🛡️ Security
 
-- 使用帮助：[`docs/ProtocolDesign_帮助文档.md`](docs/ProtocolDesign_帮助文档.md)
-- 贡献指南：[`CONTRIBUTING.md`](CONTRIBUTING.md)
-- 发布说明：[`CHANGELOG.md`](CHANGELOG.md)
+| Measure | Description |
+|---------|-------------|
+| Key Encryption | API keys are encrypted with Windows DPAPI bound to the current user identity; ciphertext can only be decrypted on the same machine by the same user |
+| Isolated Storage | Keys for different providers are stored separately; unchecking the save option immediately deletes the corresponding entry |
+| No Key Logging | API keys are never recorded in run briefs, error logs, or help documentation |
+| Resource Encryption | Skill rules and templates are encrypted with AES-256-GCM at build time; plaintext is never included in the distributable package |
 
-## 开发说明
+## ⚖️ Risk Disclaimer
 
-### 常用命令
+> **Notice: This protocol is generated by a software tool and is intended solely as a reference for the research team. It should not be regarded as a final conclusion or decision basis.** Tool-generated content may contain factual inaccuracies, insufficient logical inferences, incomplete or outdated references, or biases in understanding specific research scenarios. It may also omit critical variables, ethical compliance requirements, data security considerations, or intellectual property risks. Before adoption, the research team should verify each element — study hypotheses, technical approach, data sources, study design, compliance requirements, and feasibility — using professional judgment, and confirm the protocol through review by relevant domain experts. Any research, submissions, or implementation based on this protocol shall be subject to manual review and formal validation. The software developer bears no responsibility for any adverse consequences arising from the use of documents generated by this software.
 
-```powershell
-python -m py_compile src/ProtocolDesign.py src/protocol_renderer.py src/build_help_docx.py src/resource_crypto.py src/encrypt_resources.py
-python src/build_help_docx.py
-python src/encrypt_resources.py
-```
+## 🛠️ Tech Stack
 
-### 关键实现概览
+| Component | Technology |
+|-----------|-----------|
+| GUI Framework | Python tkinter |
+| Document Generation | python-docx |
+| Resource Encryption | AES-256-GCM (cryptography) |
+| Key Storage | Windows DPAPI (ctypes) |
+| HTTP Requests | requests |
+| Image Processing | Pillow (help doc screenshot annotation) |
+| Packaging & Distribution | PyInstaller (--onefile --windowed) |
 
-```text
-研究摘要文件
-  → 读取文本
-  → 拼接提示词（技能规则 + 写作指南 + 用户摘要）
-  → 调用大模型接口生成 JSON
-  → 修复常见 JSON 格式问题
-  → 校验结构完整性
-  → 渲染为 DOCX 研究方案
-  → 写出运行简报
-```
+## 🤝 Contributing
 
-## 风险提示
+Contributions are welcome! Please refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) for environment setup, development workflow, and pre-submission checklist.
 
-本软件生成内容由 AI 辅助完成，仅供研究团队参考，不应直接视为最终研究结论、正式申报文本或临床/科研决策依据。使用前请务必结合专业判断，对研究设计、变量定义、统计分析、伦理与数据安全要求进行人工复核。
+## 📄 License
 
-## 许可证
+This project is open-sourced under the [GPL-3.0](LICENSE) license.
 
-本项目采用 [`GPL-3.0`](LICENSE) 许可证发布。
+## 📬 Contact
 
-## 联系方式
+- **Developer**: Clinical Research Center, Longhua Hospital, Shanghai University of Traditional Chinese Medicine
+- **Email**: yangpluszhu@sina.com
+- **GitHub**: [https://github.com/yangpluszhu/ProtocolDesign](https://github.com/yangpluszhu/ProtocolDesign)
 
-- 上海中医药大学附属龙华医院临床研究中心
-- 作者邮箱：yangpluszhu@sina.com
-- 作者 GitHub：<https://github.com/yangpluszhu>
+---
+
+*ProtocolDesign V1.0 © 2025 Clinical Research Center, Longhua Hospital, Shanghai University of Traditional Chinese Medicine*

@@ -23,8 +23,9 @@ import protocol_renderer
 import resource_crypto
 
 
-APP_NAME = "ProtocolDesign"
-APP_NAME_CN = "研案智构——AI辅助临床研究方案构建系统"
+APP_NAME_EN = "ProtocolDesign"
+APP_NAME_CN = "研案智构——临床研究方案辅助构建系统"
+APP_NAME = f"{APP_NAME_CN}（{APP_NAME_EN}）"
 APP_VERSION = "V1.0"
 PRODUCER = "上海中医药大学附属龙华医院临床研究中心"
 AUTHOR_EMAIL = "yangpluszhu@sina.com"
@@ -1806,7 +1807,7 @@ class ProtocolDesignApp:
             foreground="#1F4E79",
             font=("Microsoft YaHei UI", 11, "bold"),
         )
-        style.configure("Title.TLabel", background="#FFFFFF", font=("Microsoft YaHei UI", 22, "bold"), foreground="#1F4E79")
+        style.configure("Title.TLabel", background="#FFFFFF", font=("Microsoft YaHei UI", 18, "bold"), foreground="#1F4E79")
         style.configure("TitleCn.TLabel", background="#FFFFFF", font=("Microsoft YaHei UI", 11), foreground="#52606D")
         style.configure("Meta.TLabel", background="#FFFFFF", font=("Microsoft YaHei UI", 9), foreground="#52606D")
         style.configure("FieldLabel.TLabel", background="#FFFFFF", font=("Microsoft YaHei UI", 10, "bold"), foreground="#102A43")
@@ -1889,7 +1890,7 @@ class ProtocolDesignApp:
         self.meta_group = ttk.Frame(self.header_card, style="Surface.TFrame")
 
         ttk.Label(self.title_group, text=APP_NAME, style="Title.TLabel").pack(anchor="w")
-        ttk.Label(self.title_group, text=APP_NAME_CN, style="TitleCn.TLabel").pack(anchor="w", pady=(4, 0))
+        ttk.Label(self.title_group, text=APP_NAME_EN, style="TitleCn.TLabel").pack(anchor="w", pady=(4, 0))
 
         ttk.Label(self.meta_group, text=f"{PRODUCER}  |  {APP_VERSION}", style="Meta.TLabel").pack(anchor="e")
         ttk.Label(self.meta_group, text=f"作者联系方式：Email: {AUTHOR_EMAIL}", style="Meta.TLabel").pack(anchor="e", pady=(3, 0))

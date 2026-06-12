@@ -18,8 +18,9 @@ SHOT = ROOT / "help_assets" / "ProtocolDesign_主界面.png"
 ANNOTATED = ROOT / "help_assets" / "ProtocolDesign_主界面_标注.png"
 
 PRODUCER = "上海中医药大学附属龙华医院临床研究中心"
-APP_NAME = "ProtocolDesign"
-APP_NAME_CN = "研案智构——AI辅助临床研究方案构建系统"
+APP_NAME_EN = "ProtocolDesign"
+APP_NAME_CN = "研案智构——临床研究方案辅助构建系统"
+APP_NAME = f"{APP_NAME_CN}（{APP_NAME_EN}）"
 EMAIL = "yangpluszhu@sina.com"
 GITHUB = "https://github.com/yangpluszhu/ProtocolDesign"
 VERSION = "V1.0"
@@ -58,6 +59,14 @@ def make_annotated_image() -> None:
     with Image.open(SHOT) as source:
         img = source.convert("RGB")
     draw = ImageDraw.Draw(img)
+    draw.rectangle((0, 0, 990, 126), fill=(255, 255, 255))
+    title_size = 30
+    title_font = font(title_size)
+    while title_size > 18 and draw.textbbox((0, 0), APP_NAME, font=title_font)[2] > 940:
+        title_size -= 2
+        title_font = font(title_size)
+    draw.text((20, 24), APP_NAME, font=title_font, fill=(31, 78, 121))
+    draw.text((20, 86), APP_NAME_EN, font=font(18), fill=(72, 101, 117))
     callouts = [
         (1, 0.3678, 0.1558, "选择功能模块"),
         (2, 0.3079, 0.2299, "选择摘要文档"),
@@ -144,7 +153,7 @@ def setup_doc(doc: Document) -> None:
     for sec in doc.sections:
         header = sec.header.paragraphs[0]
         header.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-        run = header.add_run(f"{APP_NAME}（{APP_NAME_CN}）帮助文档 | {VERSION}")
+        run = header.add_run(f"{APP_NAME} 帮助文档 | {VERSION}")
         set_run_font(run, size=9)
         footer = sec.footer.paragraphs[0]
         footer.alignment = WD_ALIGN_PARAGRAPH.CENTER
@@ -229,8 +238,7 @@ def table(doc, headers, rows, widths=None):
 
 def cover(doc: Document) -> None:
     p(doc, APP_NAME, "Title", WD_ALIGN_PARAGRAPH.CENTER)
-    p(doc, APP_NAME_CN, None, WD_ALIGN_PARAGRAPH.CENTER, size=14, color=(31, 78, 121))
-    p(doc, "AI辅助临床研究方案构建系统", None, WD_ALIGN_PARAGRAPH.CENTER, size=12, color=(72, 101, 117))
+    p(doc, APP_NAME_EN, None, WD_ALIGN_PARAGRAPH.CENTER, size=12, color=(72, 101, 117))
     p(doc, "用户帮助文档", None, WD_ALIGN_PARAGRAPH.CENTER, bold=True, size=18)
     doc.add_paragraph()
     table(
@@ -264,7 +272,7 @@ def add_screenshot(doc: Document) -> None:
     doc.add_picture(str(ANNOTATED), width=Cm(16.4))
     last = doc.paragraphs[-1]
     last.alignment = WD_ALIGN_PARAGRAPH.CENTER
-    p(doc, f"图 1  {APP_NAME}（{APP_NAME_CN}）主界面及关键操作区域", align=WD_ALIGN_PARAGRAPH.CENTER, size=9, color=(90, 90, 90))
+    p(doc, f"图 1  {APP_NAME} 主界面及关键操作区域", align=WD_ALIGN_PARAGRAPH.CENTER, size=9, color=(90, 90, 90))
     table(
         doc,
         ["编号", "界面区域", "作用"],
