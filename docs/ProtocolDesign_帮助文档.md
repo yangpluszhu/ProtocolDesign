@@ -1,6 +1,6 @@
-# ProtocolDesign 帮助文档
+# 临床研究方案辅助构建系统（ProtocolDesign）帮助文档
 
-软件名称：ProtocolDesign  
+软件名称：临床研究方案辅助构建系统（ProtocolDesign）  
 版本号：V1.0  
 软件制作方：上海中医药大学附属龙华医院临床研究中心  
 作者联系方式：Email: yangpluszhu@sina.com  
@@ -8,7 +8,7 @@ GitHub：https://github.com/yangpluszhu
 
 ## 软件用途
 
-ProtocolDesign 用于将研究团队提供的回顾性队列研究方案摘要，自动扩写为结构完整、格式规范的中文回顾性队列研究方案 DOCX 文档。软件内置 cohort-protocol 技能规则、模板写作指南和 `corhortCRU-small.docx` 版式模板。
+临床研究方案辅助构建系统（ProtocolDesign）用于将研究团队提供的回顾性队列研究方案摘要，自动扩写为结构完整、格式规范的中文回顾性队列研究方案 DOCX 文档。软件内置 cohort-protocol 技能规则、模板写作指南和 `corhortCRU-small.docx` 版式模板。
 
 ## 风险提示
 

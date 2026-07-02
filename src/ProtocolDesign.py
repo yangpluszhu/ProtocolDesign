@@ -24,7 +24,7 @@ import resource_crypto
 
 
 APP_NAME_EN = "ProtocolDesign"
-APP_NAME_CN = "研案智构——临床研究方案辅助构建系统"
+APP_NAME_CN = "临床研究方案辅助构建系统"
 APP_NAME = f"{APP_NAME_CN}（{APP_NAME_EN}）"
 APP_VERSION = "V1.0"
 PRODUCER = "上海中医药大学附属龙华医院临床研究中心"
